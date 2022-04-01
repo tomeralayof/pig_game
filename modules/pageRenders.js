@@ -1,51 +1,54 @@
 
 import game from "./classInstance.js"
 
-let renderImage = (randElem) => {
+const renderImage = (randElem) => {
     document.querySelector(".dice").src = randElem.value;
 }
 
-let renderCurrScore = (currScore) => {
+const renderCurrScore = (currScore) => {
     document.getElementById(`current--${game.isPlayer1 ? "0" : "1"}`).textContent = currScore;
 }
 
-let renderTotalScore = (totalScore) => {
+const renderTotalScore = (totalScore) => {
     document.getElementById(`score--${game.isPlayer1 ? "0" : "1"}`).textContent = totalScore;
 }
 
-let switchAndUpdate = () => {
+const switchAndUpdate = () => {
     game.resetCurrScore();
     renderCurrScore(game.getCurrScore());
     game.switchPlayer();
 }
 
-let renderActivePlayer = () => {
-    const currUserBackground = _activePlayer(game.isPlayer1);
-    const nextUserBackground = _activePlayer(!game.isPlayer1);
-    currUserBackground.classList.remove("player--active");
-    nextUserBackground.classList.add("player--active");
+const renderActivePlayer = (player) => {
+    const current = _getElement(player);
+    const nextPlayer = _getElement(!player);
+    _classRemove(current,"player--active");
+    nextPlayer.classList.add("player--active");
 }
 
-let renderLooser = () => {
-    const currUserBackground = _activePlayer();
-    currUserBackground.classList.remove("player--active");
+const renderLooser = (player) => {
+    const currUserBackground = _getElement(player);
+    _classRemove(currUserBackground,"player--active");
     currUserBackground.classList.add("player--winner");
 }
 
-let removeWinner = () => {
-    const currUserBackground = _activePlayer();
-    currUserBackground.classList.remove("player--winner");
-}
-
-
-let _activePlayer = () => {
-   return document.getElementsByClassName(`player player--${game.isPlayer1 ? "0" : "1"}`)[0];
-}
-
-let resetRenders = () => {
+const resetRenders = (player) => {
     renderCurrScore(0);
     renderTotalScore(0);
-    removeWinner();
+    _removeWinner(player);
+}
+
+const _getElement = (player) => {
+    return document.getElementsByClassName(`player player--${player ? "0" : "1"}`)[0];
+}
+
+const _classRemove = (currentElem,className) => {
+    currentElem.classList.remove(className);
+}
+
+const _removeWinner = (player) => {
+    const currUserBackground = _getElement(player);
+    _classRemove(currUserBackground,"player--winner");
 }
 
 let renders = {
@@ -56,7 +59,6 @@ let renders = {
     renderLooser,
     resetRenders,
     renderImage,
-    removeWinner
 }
 
 export default renders;

@@ -2,24 +2,24 @@ import game from "./classInstance.js"
 import renders from "./pageRenders.js"
 import {rollerDice} from "./gameApi.js"
 
-let handleDiceEvent = () => {
+const handleDiceEvent = () => {
 
     if(game.isFinish) {
         return;
     }
 
-    let randomCard = game.getRandom();
+    const randomCard = game.getRandom();
     renders.renderImage(randomCard);
 
     if(_oneRaffle(randomCard)) {
-        renders.renderActivePlayer();
+        renders.renderActivePlayer(game.isPlayer1);
         renders.switchAndUpdate();
         return;
     }
 
     game.setCurrScore(randomCard);
 
-    let totalScores = game.getCurrScore() + game.getTotalScore();
+    const totalScores = game.getCurrScore() + game.getTotalScore();
 
     if(totalScores > 10 || totalScores == 10){
         _looseSetup(totalScores);
@@ -29,49 +29,48 @@ let handleDiceEvent = () => {
     renders.renderCurrScore(game.getCurrScore());
 }
 
-let handleHoldEvent = () => {
+const handleHoldEvent = () => {
     
     if(game.isFinish){
         return;
     }
 
-    renders.renderActivePlayer();
-    let totalScore = game.getTotalScore();
-    let currScore = game.getCurrScore();
+    renders.renderActivePlayer(game.isPlayer1);
+    const totalScore = game.getTotalScore();
+    const currScore = game.getCurrScore();
     renders.renderTotalScore(totalScore + currScore);
     renders.switchAndUpdate();
 }
 
-let resetGame = () => {
-
-    renders.resetRenders();
+const resetGame = () => {
+    let player = game.isPlayer1;
+    renders.resetRenders(player);
     game.init(rollerDice);
-    renders.resetRenders();
+    player = game.isPlayer1;
+    renders.resetRenders(player);
     renders.renderActivePlayer();
 }
 
-
-let _oneRaffle = (randomCard) => {
+const _oneRaffle = (randomCard) => {
     return randomCard.key === 1;
 }
 
-let _looseSetup = (totalScores) => {
+const _looseSetup = (totalScores) => {
     renders.renderTotalScore(totalScores);
     _chooseLooser(totalScores);
     game.isFinish = true;
     game.isPlayer1 = false;
 }
 
-let _chooseLooser = (score) => {
-    game.isPlayer1 = score > 10 ? game.isPlayer1 : !game.isPlayer1;
-    renders.renderLooser();
+const _chooseLooser = (score) => {
+    let player = score > 10 ? game.isPlayer1 : !game.isPlayer1;
+    renders.renderLooser(player);
 }
 
-let eventHndler = {
+const eventHndler = {
     handleDiceEvent,
     handleHoldEvent,
     resetGame
 }
 
 export default eventHndler;
-
