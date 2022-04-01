@@ -1,45 +1,77 @@
-import { rollerDice  } from "./gameApi.js";
-import Game from "./GameData.js";
+import game from "./classInstance.js"
+import renders from "./pageRenders.js"
+import {rollerDice} from "./gameApi.js"
 
-let game = new Game(rollerDice);
-
-    let switchAndUpdate = () => {
-    game.resetCurrScore();
-    document.getElementById(`current--${game.isPlayer1 ? "0" : "1"}`).textContent = game.getCurrScore();
-    game.switchPlayer();
-}
- 
 let handleDiceEvent = () => {
-    let randomCard = game.getRandom();
-    document.querySelector(".dice").src = randomCard.value;
 
-    if(randomCard.key === 1) {
-        switchAndUpdate();
+    if(game.isFinish) {
+        return;
+    }
+
+    let randomCard = game.getRandom();
+    renders.renderImage(randomCard);
+
+    if(_oneRaffle(randomCard)) {
+        renders.renderActivePlayer();
+        renders.switchAndUpdate();
         return;
     }
 
     game.setCurrScore(randomCard);
-    document.getElementById(`current--${game.isPlayer1 ? "0" : "1"}`).textContent = game.getCurrScore();
 
-    if (game.getCurrScore() === 100) {
-        console.log('there is a winner');
+    let totalScores = game.getCurrScore() + game.getTotalScore();
+
+    if(totalScores > 10 || totalScores == 10){
+        _looseSetup(totalScores);
+        return;
     }
 
-    else if((game.getCurrScore() > 100)) {
-        console.log('there is a looser');
-    }
+    renders.renderCurrScore(game.getCurrScore());
 }
 
 let handleHoldEvent = () => {
-    let totalScore = Number(document.getElementById(`score--${game.isPlayer1 ? "0" : "1"}`).textContent);
+    
+    if(game.isFinish){
+        return;
+    }
+
+    renders.renderActivePlayer();
+    let totalScore = game.getTotalScore();
     let currScore = game.getCurrScore();
-    document.getElementById(`score--${game.isPlayer1 ? "0" : "1"}`).textContent = totalScore + currScore;
-    switchAndUpdate();
+    renders.renderTotalScore(totalScore + currScore);
+    renders.switchAndUpdate();
+}
+
+let resetGame = () => {
+
+    renders.resetRenders();
+    game.init(rollerDice);
+    renders.resetRenders();
+    renders.renderActivePlayer();
+}
+
+
+let _oneRaffle = (randomCard) => {
+    return randomCard.key === 1;
+}
+
+let _looseSetup = (totalScores) => {
+    renders.renderTotalScore(totalScores);
+    _chooseLooser(totalScores);
+    game.isFinish = true;
+    game.isPlayer1 = false;
+}
+
+let _chooseLooser = (score) => {
+    game.isPlayer1 = score > 10 ? game.isPlayer1 : !game.isPlayer1;
+    renders.renderLooser();
 }
 
 let eventHndler = {
     handleDiceEvent,
     handleHoldEvent,
+    resetGame
 }
 
 export default eventHndler;
+

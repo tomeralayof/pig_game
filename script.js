@@ -8,7 +8,4 @@ const holdBtn = document.querySelector(".btn--hold");
 
 diceBtn.addEventListener("click",eventHndler.handleDiceEvent);
 holdBtn.addEventListener("click", eventHndler.handleHoldEvent);
-
-/* resetBtn.addEventListener("click", () => {
-    game.resetAll();
-}) */
+resetBtn.addEventListener("click",eventHndler.resetGame);
